@@ -16,6 +16,7 @@ class INTRO_API UIntroGameInstance : public UGameInstance
 
 public:
 	const FColor& GetPlayerColor();
+	void SetPlayerColor(FColor Color);
 
 private:
 	FColor PlayerColor = FColor::Black;

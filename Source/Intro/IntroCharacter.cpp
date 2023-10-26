@@ -61,6 +61,7 @@ void AIntroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("SitInACar", IE_Pressed, this, &AIntroCharacter::SitInACar);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AIntroCharacter::Fire);
+	PlayerInputComponent->BindAction("ChangeCharColor", IE_Pressed, this, &AIntroCharacter::ChangeCharColor);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AIntroCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AIntroCharacter::MoveRight);
@@ -89,6 +90,9 @@ void AIntroCharacter::ExitACar()
 	if (IsValid(CurrentActiveChar))
 	{
 		CurrentController->Possess(CurrentActiveChar);
+
+		USkeletalMeshComponent* CarMesh = CurrentActiveCar->FindComponentByClass<USkeletalMeshComponent>();
+		CarMesh->SetCollisionObjectType(ECollisionChannel::ECC_Vehicle);
 	}
 
  	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -102,7 +106,11 @@ void AIntroCharacter::SitInACar()
 	if (IsValid(CurrentActiveCar))
 	{
 		CurrentController->Possess(CurrentActiveCar);
+
+		USkeletalMeshComponent* CarMesh = CurrentActiveCar->FindComponentByClass<USkeletalMeshComponent>();
+		CarMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
 	}
+
 	AttachToActor(CurrentActiveCar, FAttachmentTransformRules::KeepRelativeTransform);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetActorRelativeLocation(FVector(0.0f, 0.0f, 500.0f));
@@ -142,11 +150,21 @@ void AIntroCharacter::Fire()
 void AIntroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UMaterialInstanceDynamic* NewMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
-	UIntroGameInstance* GameInstance = Cast<UIntroGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	NewMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
+	GameInstance = Cast<UIntroGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (IsValid(GameInstance) && IsValid(NewMaterialInstance))
 	{
 		NewMaterialInstance->SetVectorParameterValue(FName("BodyColor"), FLinearColor(GameInstance->GetPlayerColor()));
+	}
+}
+
+void AIntroCharacter::ChangeCharColor()
+{
+	if (IsValid(NewMaterialInstance))
+	{
+		FColor NewColor = FColor::MakeRandomColor();
+		NewMaterialInstance->SetVectorParameterValue(FName("BodyColor"), NewColor);
+		GameInstance->SetPlayerColor(NewColor);
 	}
 }
 

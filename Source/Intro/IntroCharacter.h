@@ -51,6 +51,8 @@ protected:
 
 	void SitInACar();
 
+	void ChangeCharColor();
+
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 
@@ -96,5 +98,7 @@ public:
 private:
 	class AWheeledVehicle* CurrentActiveCar;
 	class AIntroCharacter* CurrentActiveChar;
+	class UMaterialInstanceDynamic* NewMaterialInstance;
+	class UIntroGameInstance* GameInstance;
 };
 

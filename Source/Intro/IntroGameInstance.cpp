@@ -12,3 +12,8 @@ const FColor& UIntroGameInstance::GetPlayerColor()
     }
     return PlayerColor;
 }
+
+void UIntroGameInstance::SetPlayerColor(FColor Color)
+{
+    PlayerColor = Color;
+}
